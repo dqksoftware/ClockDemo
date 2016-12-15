@@ -35,7 +35,7 @@ typedef NS_ENUM(NSInteger, Time) {
         [self setUpView];
         self.backgroundColor = [UIColor redColor];
        // [self addTimeer];
-        [self getPointsForNowTime];
+//        [self getPointsForNowTime];
         
     }
     return self;
@@ -134,7 +134,7 @@ typedef NS_ENUM(NSInteger, Time) {
     if (timeType == TimePoints) {
         return [hourTime componentsSeparatedByString:@":"][1];
     }
-    
+    return nil;
 }
 
 - (void)dealloc{
