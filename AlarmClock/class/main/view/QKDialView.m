@@ -24,6 +24,8 @@ typedef NS_ENUM(NSInteger, Time) {
 
 @property(nonatomic, strong)NSTimer *timer;
 
+@property(nonatomic, strong)UIView *pointDialView;
+
 @end
 
 @implementation QKDialView
@@ -57,17 +59,28 @@ typedef NS_ENUM(NSInteger, Time) {
         make.bottom.equalTo(self.mas_bottom);
         make.height.equalTo(self.mas_height);
     }];
+    
     CGFloat lblWidth = 30.f;
     CGFloat lblHeight = 25.f;
     CGFloat lblx;
     CGFloat lbly = 30.f;   //最高的y值是10；  最低的是30.
     CGFloat r = 380.f;  //圆的半径
-    CGFloat x = SWIDTH / 2 - 7;  //圆心x坐标
+    CGFloat x = SWIDTH / 2-10;  //圆心x坐标
     CGFloat y = 406; //圆心y坐标
     CGFloat startAngel = -240;  //开始弧度
     CGFloat endAngel = 60;      //结束弧度
     CGFloat criticalAngel = 90.f;
-    NSInteger lblconut = (endAngel - startAngel) / 5;
+    NSInteger lblconut = ((90 - endAngel) + (startAngel - (-270))) / 5;
+    
+     UIView *deialPointView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2 * r, 2 * r)];
+    deialPointView.qk_centerX = x;
+    deialPointView.qk_centerY = y;
+    deialPointView.layer.cornerRadius = r;
+    deialPointView.layer.masksToBounds = YES;
+    deialPointView.backgroundColor = [UIColor blackColor];
+    [self addSubview:deialPointView];
+    NSLog(@"");
+    
     for (int i = 1; i <= lblconut; i++) {
         if (startAngel <= -270.f) {
             lblx = x + r * cosf(criticalAngel * M_PI / 180);
@@ -81,7 +94,15 @@ typedef NS_ENUM(NSInteger, Time) {
         CGRect lblFrame = CGRectMake(lblx, lbly, lblWidth, lblHeight);
         [self.lblFrameArrayM addObject:NSStringFromCGRect(lblFrame)];
         UILabel *lable = [[UILabel alloc] initWithFrame:lblFrame];
-        lable.text = [NSString stringWithFormat:@"%d", i];
+        lable.backgroundColor = [UIColor blueColor];
+        lable.textAlignment = NSTextAlignmentCenter;
+        lable.textColor = [UIColor whiteColor];
+        if (i < 10) {
+           lable.text = [NSString stringWithFormat:@"%.2d", i];
+        }else{
+            lable.text = [NSString stringWithFormat:@"%d", i];
+        }
+        
         lable.tag = i + 200;
         [self.lblArrayM addObject:lable];
         [self addSubview:lable];

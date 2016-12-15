@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		348DE0C01E029D6D0027818F /* UIView+QKFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 348DE0BF1E029D6D0027818F /* UIView+QKFrame.m */; };
 		456364FDE073975C53B5F843 /* libPods-AlarmClock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B8B9315E5617C594364B75F8 /* libPods-AlarmClock.a */; };
 		F0AA1E281E00E2520033D8E9 /* QKDialView.m in Sources */ = {isa = PBXBuildFile; fileRef = F0AA1E271E00E2520033D8E9 /* QKDialView.m */; };
 		F0AA1E321E011A740033D8E9 /* Andrew-Neel.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F0AA1E2A1E011A740033D8E9 /* Andrew-Neel.jpg */; };
@@ -46,6 +47,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		348DE0BE1E029D6D0027818F /* UIView+QKFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+QKFrame.h"; sourceTree = "<group>"; };
+		348DE0BF1E029D6D0027818F /* UIView+QKFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+QKFrame.m"; sourceTree = "<group>"; };
 		B8B9315E5617C594364B75F8 /* libPods-AlarmClock.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AlarmClock.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD837C7BACFC3C90430013B9 /* Pods-AlarmClock.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AlarmClock.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AlarmClock/Pods-AlarmClock.debug.xcconfig"; sourceTree = "<group>"; };
 		E01EBECFC6B2159E3F16A403 /* Pods-AlarmClock.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AlarmClock.release.xcconfig"; path = "Pods/Target Support Files/Pods-AlarmClock/Pods-AlarmClock.release.xcconfig"; sourceTree = "<group>"; };
@@ -113,6 +116,15 @@
 				B8B9315E5617C594364B75F8 /* libPods-AlarmClock.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		348DE0BD1E029D6D0027818F /* view */ = {
+			isa = PBXGroup;
+			children = (
+				348DE0BE1E029D6D0027818F /* UIView+QKFrame.h */,
+				348DE0BF1E029D6D0027818F /* UIView+QKFrame.m */,
+			);
+			path = view;
 			sourceTree = "<group>";
 		};
 		C8EBA9A1F753322CC5B941FE /* Pods */ = {
@@ -253,6 +265,7 @@
 		F0DACA4B1DFFD2FC00DC1D1E /* common */ = {
 			isa = PBXGroup;
 			children = (
+				348DE0BD1E029D6D0027818F /* view */,
 				F0DACA4C1DFFD32100DC1D1E /* PrefixHeader.pch */,
 			);
 			path = common;
@@ -456,6 +469,7 @@
 				F0DACA061DFFC66600DC1D1E /* main.m in Sources */,
 				F0DACA471DFFD16400DC1D1E /* QKMainController.m in Sources */,
 				F0DACA421DFFC7C500DC1D1E /* QKNavigationController.m in Sources */,
+				348DE0C01E029D6D0027818F /* UIView+QKFrame.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
