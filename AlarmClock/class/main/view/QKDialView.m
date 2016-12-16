@@ -30,15 +30,17 @@ typedef NS_ENUM(NSInteger, Time) {
 
 @implementation QKDialView
 
+
+
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if(self)
     {
         [self setUpView];
         self.backgroundColor = [UIColor redColor];
-       // [self addTimeer];
-//        [self getPointsForNowTime];
         
+        [self pointChange];
+//        [self addTimeer];
     }
     return self;
 }
@@ -59,80 +61,48 @@ typedef NS_ENUM(NSInteger, Time) {
         make.bottom.equalTo(self.mas_bottom);
         make.height.equalTo(self.mas_height);
     }];
-    
     CGFloat lblWidth = 30.f;
     CGFloat lblHeight = 25.f;
-    CGFloat lblx;
-    CGFloat lbly = 30.f;   //最高的y值是10；  最低的是30.
     CGFloat r = 380.f;  //圆的半径
-    CGFloat x = SWIDTH / 2-10;  //圆心x坐标
-    CGFloat y = 406; //圆心y坐标
-    CGFloat startAngel = -240;  //开始弧度
-    CGFloat endAngel = 60;      //结束弧度
-    CGFloat criticalAngel = 90.f;
-    NSInteger lblconut = ((90 - endAngel) + (startAngel - (-270))) / 5;
-    
-     UIView *deialPointView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2 * r, 2 * r)];
+    CGFloat x = SWIDTH / 2;  //圆心x坐标
+    CGFloat y = r + 15; //圆心y坐标
+    CGFloat startAngel = 130;  //开始弧度
+    CGFloat endAngel = 50;      //结束弧度
+    NSInteger lblconut = (startAngel - endAngel) / 5;
+    UIView *deialPointView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2 * r, 2 * r)];
     deialPointView.qk_centerX = x;
     deialPointView.qk_centerY = y;
-    deialPointView.layer.cornerRadius = r;
-    deialPointView.layer.masksToBounds = YES;
-    deialPointView.backgroundColor = [UIColor blackColor];
+    self.pointDialView = deialPointView;
     [self addSubview:deialPointView];
-    NSLog(@"");
-    
-    for (int i = 1; i <= lblconut; i++) {
-        if (startAngel <= -270.f) {
-            lblx = x + r * cosf(criticalAngel * M_PI / 180);
-            lbly = y - r * sinf(criticalAngel * M_PI / 180);
-            criticalAngel -= 5;
-        }else{
-            lblx = x + r * cosf(startAngel * M_PI / 180);
-            lbly = y - r * sinf(startAngel * M_PI / 180);
-          startAngel -= 5;
-        }
-        CGRect lblFrame = CGRectMake(lblx, lbly, lblWidth, lblHeight);
+    for (int i = 0; i < lblconut; i++) {
+        CGPoint point = [self calcCircleCoordinateWithCenter:CGPointMake(x, y) andWithAngle:startAngel andWithRadius:r];
+            startAngel -= 5;
+        CGRect lblFrame = CGRectMake(point.x, point.y, lblWidth, lblHeight);
         [self.lblFrameArrayM addObject:NSStringFromCGRect(lblFrame)];
-        UILabel *lable = [[UILabel alloc] initWithFrame:lblFrame];
-        lable.backgroundColor = [UIColor blueColor];
+        UILabel *lable = [[UILabel alloc] init];
+        lable.qk_height = lblFrame.size.height;
+        lable.qk_width = lblFrame.size.width;
+        lable.qk_centerY = lblFrame.origin.y;
+        lable.qk_centerX = lblFrame.origin.x;
         lable.textAlignment = NSTextAlignmentCenter;
         lable.textColor = [UIColor whiteColor];
-        if (i < 10) {
-           lable.text = [NSString stringWithFormat:@"%.2d", i];
-        }else{
-            lable.text = [NSString stringWithFormat:@"%d", i];
-        }
-        
         lable.tag = i + 200;
         [self.lblArrayM addObject:lable];
-        [self addSubview:lable];
+        [self.pointDialView addSubview:lable];
     }
     
 }
 
 //添加定时器
 - (void)addTimeer{
-    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1.f target:self selector:@selector(timeAction) userInfo:nil repeats:YES];
+    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:3.f target:self selector:@selector(timeAction) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
     self.timer = timer;
     [timer fire];
 }
 
 - (void)timeAction{
-    //获取弧度为90的点
-    CGFloat lblWidth = 30.f;
-    CGFloat lblHeight = 25.f;
-    CGFloat r = 380.f;  //圆的半径
-    CGFloat y = 406; //圆心y坐标
-    CGFloat x = SWIDTH / 2 - 7;  //圆心x坐标
-    CGRect frame90 = CGRectMake(x + r * cosf(90 * M_PI / 180), y - r * sinf(90 * M_PI / 180), lblWidth, lblHeight);
-    for (int i = 0; i < self.lblFrameArrayM.count; i++) {
-        if ([NSStringFromCGRect(frame90) isEqualToString:self.lblFrameArrayM[i]]) {
-            //弧度为90的坐标
-            UILabel *lable = self.lblArrayM[i];
-            lable.text = @"90";
-        }
-    }
+    [self addtimeDatilForLabel];
 }
 
 //获取当前的时分秒
@@ -141,7 +111,6 @@ typedef NS_ENUM(NSInteger, Time) {
     NSDateFormatter *formate = [[NSDateFormatter alloc] init];
     formate.dateFormat = @"yyyy-MM-dd hh:mm:ss";
     NSString *dateStr = [formate stringFromDate:nowDate];
-    NSLog(@"==========  %@", dateStr);
     //NSString *yearTime = [dateStr componentsSeparatedByString:@" "].firstObject;
     NSString *hourTime = [dateStr componentsSeparatedByString:@" "].lastObject;
     if (timeType == TimeHour) {
@@ -151,12 +120,101 @@ typedef NS_ENUM(NSInteger, Time) {
     if (timeType == TimeSeconds) {
         return [hourTime componentsSeparatedByString:@":"].lastObject;
     }
-    
     if (timeType == TimePoints) {
         return [hourTime componentsSeparatedByString:@":"][1];
     }
     return nil;
 }
+
+//计算圆周上的坐标点    此方法适合计算在x轴上半周  即0 - 90 - 180 的度数
+-(CGPoint) calcCircleCoordinateWithCenter:(CGPoint)center andWithAngle:(CGFloat)angle andWithRadius:(CGFloat) radius{
+    CGFloat x2 = radius*cosf(angle*M_PI/180);
+    CGFloat y2 = radius*sinf(angle*M_PI/180);
+    if (angle >= 90 && angle < 180) {     //第一象限
+        x2 = radius - fabs(x2);
+        y2 = radius - fabs(y2);
+    }else if(angle < 90 && angle >= 0){    //第二象限
+        x2 = radius + fabs(x2);
+        y2 = radius - fabs(y2);
+    }else if(angle > 180 && angle <= 270){   //第三象限
+        x2 = radius - fabs(x2);
+        y2 = radius + fabs(y2);
+    }else{                                    //第四象限
+        x2 = radius + fabs(x2);
+        y2 = radius + fabs(y2);
+    }
+    return CGPointMake(fabs(x2), fabs(y2));
+}
+
+
+#pragma mark  添加刻度值
+- (void)addtimeDatilForLabel{
+    CGFloat lblWidth = 30.f;
+    CGFloat lblHeight = 25.f;
+    CGFloat r = 380.f;  //圆的半径
+    CGFloat x = SWIDTH / 2 ;  //圆心x坐标
+    CGFloat y = r + 15; //圆心y坐标
+    //当前 的分钟数值
+    NSString *currentPoint =[self getPointsForNowTime:TimePoints];
+    NSInteger currentPointInt = currentPoint.integerValue;
+    CGPoint point = [self calcCircleCoordinateWithCenter:CGPointMake(x, y) andWithAngle:90 andWithRadius:r];
+    CGRect lblFrame = CGRectMake(point.x, point.y, lblWidth, lblHeight);
+    NSInteger angle90Index = [self.lblFrameArrayM indexOfObject:NSStringFromCGRect(lblFrame)];
+    CGFloat otherLabelTime;
+    for (int i = 0; i < self.lblArrayM.count; i++) {
+        UILabel *currentLabel = self.lblArrayM[i];
+        NSInteger tag = currentLabel.tag - 200;
+        if (tag != angle90Index) {
+            if (currentPointInt - (angle90Index - tag) >= 60) {
+                otherLabelTime = currentPointInt - (angle90Index - tag) - 60;
+            }else if((currentPointInt - (angle90Index - tag)) < 0){
+                otherLabelTime = currentPointInt - (angle90Index - tag) + 60;
+            }else{
+                otherLabelTime = currentPointInt - (angle90Index - tag);
+            }
+            if (otherLabelTime < 10) {
+                currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelTime)];
+            }else{
+                currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelTime)];
+            }
+            
+        }else{
+            currentLabel.textColor = [UIColor orangeColor];
+            currentLabel.text = @"100";
+        }
+    }
+}
+
+
+#pragma mark  ------- 位移互换
+- (void)pointChange{
+    
+    for (UILabel *label in self.lblArrayM) {
+        
+        NSLog(@"  变换前   ---------  %@", NSStringFromCGRect(label.frame));
+    }
+    
+    for (int i = 0; i < self.lblFrameArrayM.count; i++) {
+        UILabel *label = self.lblArrayM[i];
+        if (i != 0) {
+            //标签的frame 都往前位移一位
+            label.frame = CGRectFromString(self.lblFrameArrayM[i-1]);
+        }else{  //第一个标签 是最后一个frame
+            label.frame = CGRectFromString(self.lblFrameArrayM.lastObject);
+        }
+        
+    }
+    
+    
+    for (UILabel *label in self.lblArrayM) {
+        
+        NSLog(@"  变换后   ---------  %@", NSStringFromCGRect(label.frame));
+    }
+    
+}
+
+
+
 
 - (void)dealloc{
     [self.timer invalidate];
