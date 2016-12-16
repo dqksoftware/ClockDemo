@@ -90,7 +90,6 @@ typedef NS_ENUM(NSInteger, Time) {
         [self.lblArrayM addObject:lable];
         [self.pointDialView addSubview:lable];
     }
-    
 }
 
 //添加定时器
@@ -191,7 +190,11 @@ typedef NS_ENUM(NSInteger, Time) {
     
     for (UILabel *label in self.lblArrayM) {
         
-        NSLog(@"  变换前   ---------  %@", NSStringFromCGRect(label.frame));
+        NSLog(@"  变换前   ---------  %@ ", NSStringFromCGRect(label.frame));
+    }
+    
+    for (NSString *frame in self.lblFrameArrayM) {
+        NSLog(@" frame =================  %@", frame);
     }
     
     for (int i = 0; i < self.lblFrameArrayM.count; i++) {
@@ -199,13 +202,14 @@ typedef NS_ENUM(NSInteger, Time) {
         if (i != 0) {
             //标签的frame 都往前位移一位
             label.frame = CGRectFromString(self.lblFrameArrayM[i-1]);
+            label.qk_centerX = CGRectFromString(self.lblFrameArrayM[i-1]).origin.x;
+            label.qk_centerY = CGRectFromString(self.lblFrameArrayM[i-1]).origin.y;
         }else{  //第一个标签 是最后一个frame
             label.frame = CGRectFromString(self.lblFrameArrayM.lastObject);
+            label.qk_centerX = CGRectFromString(self.lblFrameArrayM.lastObject).origin.x;
+            label.qk_centerY = CGRectFromString(self.lblFrameArrayM.lastObject).origin.y;
         }
-        
     }
-    
-    
     for (UILabel *label in self.lblArrayM) {
         
         NSLog(@"  变换后   ---------  %@", NSStringFromCGRect(label.frame));
