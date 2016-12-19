@@ -50,9 +50,12 @@ typedef NS_ENUM(NSInteger, Time) {
     {
         [self setUpView];
         self.mainTimeModel = [[QKMainTimeModel alloc] init];
-        self.backgroundColor = [UIColor redColor];
-        [self pointChange];
+        //初始化
+        [self addtimeDatilForLabel];
         [self addTimeer];       //添加定时器
+        //添加观察者
+        [self addObserver];
+        
     }
     return self;
 }
@@ -81,6 +84,7 @@ typedef NS_ENUM(NSInteger, Time) {
     CGFloat startAngel = 130;  //开始弧度
     CGFloat endAngel = 50;      //结束弧度
     NSInteger lblconut = (startAngel - endAngel) / 5;
+    //转盘视图
     UIView *deialPointView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2 * r, 2 * r)];
     deialPointView.qk_centerX = x;
     deialPointView.qk_centerY = y;
@@ -99,6 +103,7 @@ typedef NS_ENUM(NSInteger, Time) {
         lable.textAlignment = NSTextAlignmentCenter;
         lable.textColor = [UIColor whiteColor];
         lable.tag = i + 200;
+        
         [self.lblArrayM addObject:lable];
         [self.pointDialView addSubview:lable];
     }
@@ -121,12 +126,12 @@ typedef NS_ENUM(NSInteger, Time) {
 }
 
 - (void)timeAction{
+    //显示当前的日期时间
     QKMainTimeModel *mainTimeModel = [self getTimeModel];
     self.mainTimeView.mainTimeModel = mainTimeModel;
-
-//    [self addtimeDatilForLabel];
+    //当值有变化就改变弧度
+    [self pointChange];
 }
-
 
 - (QKMainTimeModel *)getTimeModel{
     //获取当前时
@@ -182,17 +187,18 @@ typedef NS_ENUM(NSInteger, Time) {
         NSInteger unitFlags = NSCalendarUnitWeekday;
         comps = [calendar components:unitFlags fromDate:nowDate];
         return [NSString stringWithFormat:@"%ld", [comps weekday]];
-
     }
     
     return nil;
 }
 
+#pragma mark  ----  计算坐标点
 //计算圆周上的坐标点    此方法适合计算在x轴上半周  即0 - 90 - 180 的度数
 -(CGPoint) calcCircleCoordinateWithCenter:(CGPoint)center andWithAngle:(CGFloat)angle andWithRadius:(CGFloat) radius{
     CGFloat x2 = radius*cosf(angle*M_PI/180);
+    
     CGFloat y2 = radius*sinf(angle*M_PI/180);
-    if (angle >= 90 && angle < 180) {     //第一象限
+    if (angle >= 90 && angle < 180) {     //第象限
         x2 = radius - fabs(x2);
         y2 = radius - fabs(y2);
     }else if(angle < 90 && angle >= 0){    //第二象限
@@ -222,31 +228,32 @@ typedef NS_ENUM(NSInteger, Time) {
     CGPoint point = [self calcCircleCoordinateWithCenter:CGPointMake(x, y) andWithAngle:90 andWithRadius:r];
     CGRect lblFrame = CGRectMake(point.x, point.y, lblWidth, lblHeight);
     NSInteger angle90Index = [self.lblFrameArrayM indexOfObject:NSStringFromCGRect(lblFrame)];
-    CGFloat otherLabelTime;
+    CGFloat otherLabelTimeMinutes;
     for (int i = 0; i < self.lblArrayM.count; i++) {
         UILabel *currentLabel = self.lblArrayM[i];
         NSInteger tag = currentLabel.tag - 200;
         if (tag != angle90Index) {
+            
             if (currentPointInt - (angle90Index - tag) >= 60) {
-                otherLabelTime = currentPointInt - (angle90Index - tag) - 60;
+                
+                otherLabelTimeMinutes = currentPointInt - (angle90Index - tag) - 60;
+                
             }else if((currentPointInt - (angle90Index - tag)) < 0){
-                otherLabelTime = currentPointInt - (angle90Index - tag) + 60;
+                otherLabelTimeMinutes = currentPointInt - (angle90Index - tag) + 60;
             }else{
-                otherLabelTime = currentPointInt - (angle90Index - tag);
+                otherLabelTimeMinutes = currentPointInt - (angle90Index - tag);
             }
-            if (otherLabelTime < 10) {
-                currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelTime)];
+            if (otherLabelTimeMinutes < 10) {
+                currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelTimeMinutes)];
             }else{
-                currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelTime)];
+                currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelTimeMinutes)];
             }
         }else{
-            currentLabel.textColor = [UIColor orangeColor];
-            currentLabel.text = @"100";
+            
+            currentLabel.text = [self getPointsForNowTime:TimePoints];;
         }
     }
 }
-
-
 #pragma mark  ------- 位移互换
 - (void)pointChange{
         for (int i = 0; i < self.lblFrameArrayM.count; i++) {
@@ -264,12 +271,22 @@ typedef NS_ENUM(NSInteger, Time) {
     }
 }
 
+#pragma mark  ----- 观察者方法
 
+- (void)addObserver{
+    [self addObserver:self forKeyPath:@"mainTimeModel.minutes" options:NSKeyValueObservingOptionNew context:nil];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
+//    [self pointChange];
+//    NSLog(@" 我是监听者:  ===== %@", change[@"new"]);
+}
 
 
 - (void)dealloc{
     [self.timer invalidate];
     self.timer = nil;
+    [self removeObserver:self forKeyPath:@"mainTimeModel.minutes"];
 }
 
 
