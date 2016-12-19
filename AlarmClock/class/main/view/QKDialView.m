@@ -7,24 +7,36 @@
 //
 
 #import "QKDialView.h"
+#import "QKMainTimeModel.h"
+#import "QKMainTimeView.h"
 
 typedef NS_ENUM(NSInteger, Time) {
     TimeHour = 0,
-    TimePoints,
-    TimeSeconds
+    TimePoints = 1,
+    TimeSeconds = 2,
+    TimeYear = 3,
+    TimeMonth = 4,
+    TimeDay = 5,
+    TimeWeek,
 };
 
 @interface QKDialView ()
 
-@property(nonatomic, strong)UIImageView *backGroundImage;
+@property(nonatomic, strong)UIImageView *backGroundImage;   //背景图片
 
-@property(nonatomic, strong)NSMutableArray *lblFrameArrayM;
+@property(nonatomic, strong)NSMutableArray *lblFrameArrayM;   //标签刻度frame数组
 
-@property(nonatomic, strong)NSMutableArray *lblArrayM;
+@property(nonatomic, strong)NSMutableArray *lblArrayM;  //标签刻度数组
 
-@property(nonatomic, strong)NSTimer *timer;
+@property(nonatomic, strong)NSTimer *timer;  //定时器
 
-@property(nonatomic, strong)UIView *pointDialView;
+@property(nonatomic, strong)UIView *pointDialView;  //分转盘
+
+@property(nonatomic, strong)QKMainTimeView *mainTimeView;   //时间视图
+
+@property(nonatomic, strong)QKMainTimeModel *mainTimeModel;   //时间模型
+
+
 
 @end
 
@@ -37,10 +49,10 @@ typedef NS_ENUM(NSInteger, Time) {
     if(self)
     {
         [self setUpView];
+        self.mainTimeModel = [[QKMainTimeModel alloc] init];
         self.backgroundColor = [UIColor redColor];
-        
         [self pointChange];
-//        [self addTimeer];
+        [self addTimeer];       //添加定时器
     }
     return self;
 }
@@ -90,18 +102,52 @@ typedef NS_ENUM(NSInteger, Time) {
         [self.lblArrayM addObject:lable];
         [self.pointDialView addSubview:lable];
     }
+    self.mainTimeView = [QKMainTimeView new];
+    [self addSubview:self.mainTimeView];
+    [self.mainTimeView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(@50);
+        make.centerX.equalTo(self.mas_centerX);
+        make.bottom.equalTo(self.mas_bottom).offset(-15);
+        make.width.equalTo(@(SWIDTH / 2 + 20));
+    }];
 }
 
 //添加定时器
 - (void)addTimeer{
-    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:3.f target:self selector:@selector(timeAction) userInfo:nil repeats:YES];
+    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(timeAction) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
     self.timer = timer;
     [timer fire];
 }
 
 - (void)timeAction{
-    [self addtimeDatilForLabel];
+    QKMainTimeModel *mainTimeModel = [self getTimeModel];
+    self.mainTimeView.mainTimeModel = mainTimeModel;
+
+//    [self addtimeDatilForLabel];
+}
+
+
+- (QKMainTimeModel *)getTimeModel{
+    //获取当前时
+    NSString *hour = [self getPointsForNowTime:TimeHour];
+    //获取当前分
+    NSString *minute = [self getPointsForNowTime:TimePoints];
+    //获取当前年
+    NSString *year = [self getPointsForNowTime:TimeYear];
+    //获取当年月
+    NSString *month = [self getPointsForNowTime:TimeMonth];
+    //获取当前日
+    NSString *day = [self getPointsForNowTime:TimeDay];
+    //获取周天
+    NSString *week = [self getPointsForNowTime:TimeWeek];
+    self.mainTimeModel.hour = hour;
+    self.mainTimeModel.minutes = minute;
+    self.mainTimeModel.year = year;
+    self.mainTimeModel.month = month;
+    self.mainTimeModel.day = day;
+    self.mainTimeModel.weeks = week;
+    return self.mainTimeModel;
 }
 
 //获取当前的时分秒
@@ -110,10 +156,9 @@ typedef NS_ENUM(NSInteger, Time) {
     NSDateFormatter *formate = [[NSDateFormatter alloc] init];
     formate.dateFormat = @"yyyy-MM-dd hh:mm:ss";
     NSString *dateStr = [formate stringFromDate:nowDate];
-    //NSString *yearTime = [dateStr componentsSeparatedByString:@" "].firstObject;
+    NSString *yearTime = [dateStr componentsSeparatedByString:@" "].firstObject;
     NSString *hourTime = [dateStr componentsSeparatedByString:@" "].lastObject;
     if (timeType == TimeHour) {
-        
         return [hourTime componentsSeparatedByString:@":"].firstObject;
     }
     if (timeType == TimeSeconds) {
@@ -122,6 +167,24 @@ typedef NS_ENUM(NSInteger, Time) {
     if (timeType == TimePoints) {
         return [hourTime componentsSeparatedByString:@":"][1];
     }
+    if (timeType == TimeYear) {
+        return [yearTime componentsSeparatedByString:@"-"].firstObject;
+    }
+    if (timeType == TimeMonth) {
+        return [yearTime componentsSeparatedByString:@"-"][1];
+    }
+    if (timeType == TimeDay) {
+        return [yearTime componentsSeparatedByString:@"-"].lastObject;
+    }
+    if (timeType == TimeWeek) {
+        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierIndian];
+        NSDateComponents *comps = [[NSDateComponents alloc] init];
+        NSInteger unitFlags = NSCalendarUnitWeekday;
+        comps = [calendar components:unitFlags fromDate:nowDate];
+        return [NSString stringWithFormat:@"%ld", [comps weekday]];
+
+    }
+    
     return nil;
 }
 
@@ -176,7 +239,6 @@ typedef NS_ENUM(NSInteger, Time) {
             }else{
                 currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelTime)];
             }
-            
         }else{
             currentLabel.textColor = [UIColor orangeColor];
             currentLabel.text = @"100";
@@ -187,17 +249,7 @@ typedef NS_ENUM(NSInteger, Time) {
 
 #pragma mark  ------- 位移互换
 - (void)pointChange{
-    
-    for (UILabel *label in self.lblArrayM) {
-        
-        NSLog(@"  变换前   ---------  %@ ", NSStringFromCGRect(label.frame));
-    }
-    
-    for (NSString *frame in self.lblFrameArrayM) {
-        NSLog(@" frame =================  %@", frame);
-    }
-    
-    for (int i = 0; i < self.lblFrameArrayM.count; i++) {
+        for (int i = 0; i < self.lblFrameArrayM.count; i++) {
         UILabel *label = self.lblArrayM[i];
         if (i != 0) {
             //标签的frame 都往前位移一位
@@ -210,11 +262,6 @@ typedef NS_ENUM(NSInteger, Time) {
             label.qk_centerY = CGRectFromString(self.lblFrameArrayM.lastObject).origin.y;
         }
     }
-    for (UILabel *label in self.lblArrayM) {
-        
-        NSLog(@"  变换后   ---------  %@", NSStringFromCGRect(label.frame));
-    }
-    
 }
 
 
