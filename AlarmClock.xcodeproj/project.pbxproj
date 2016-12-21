@@ -11,6 +11,9 @@
 		3416B54D1E077DC100C70B98 /* QKMainTimeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3416B54C1E077DC100C70B98 /* QKMainTimeModel.m */; };
 		3416B5501E077F7A00C70B98 /* QKMainTimeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3416B54F1E077F7A00C70B98 /* QKMainTimeView.m */; };
 		348DE0C01E029D6D0027818F /* UIView+QKFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 348DE0BF1E029D6D0027818F /* UIView+QKFrame.m */; };
+		34A24EB41E0A1ED3007C9971 /* QKConst.m in Sources */ = {isa = PBXBuildFile; fileRef = 34A24EB31E0A1ED3007C9971 /* QKConst.m */; };
+		34A24EB71E0A5651007C9971 /* QKSecondsDialView.m in Sources */ = {isa = PBXBuildFile; fileRef = 34A24EB61E0A5651007C9971 /* QKSecondsDialView.m */; };
+		34A24EBA1E0A60D7007C9971 /* QKDateTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 34A24EB91E0A60D7007C9971 /* QKDateTool.m */; };
 		456364FDE073975C53B5F843 /* libPods-AlarmClock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B8B9315E5617C594364B75F8 /* libPods-AlarmClock.a */; };
 		F0AA1E281E00E2520033D8E9 /* QKDialView.m in Sources */ = {isa = PBXBuildFile; fileRef = F0AA1E271E00E2520033D8E9 /* QKDialView.m */; };
 		F0AA1E321E011A740033D8E9 /* Andrew-Neel.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F0AA1E2A1E011A740033D8E9 /* Andrew-Neel.jpg */; };
@@ -58,6 +61,12 @@
 		3416B54F1E077F7A00C70B98 /* QKMainTimeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QKMainTimeView.m; sourceTree = "<group>"; };
 		348DE0BE1E029D6D0027818F /* UIView+QKFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+QKFrame.h"; sourceTree = "<group>"; };
 		348DE0BF1E029D6D0027818F /* UIView+QKFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+QKFrame.m"; sourceTree = "<group>"; };
+		34A24EB21E0A1ED3007C9971 /* QKConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QKConst.h; sourceTree = "<group>"; };
+		34A24EB31E0A1ED3007C9971 /* QKConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QKConst.m; sourceTree = "<group>"; };
+		34A24EB51E0A5651007C9971 /* QKSecondsDialView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QKSecondsDialView.h; sourceTree = "<group>"; };
+		34A24EB61E0A5651007C9971 /* QKSecondsDialView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QKSecondsDialView.m; sourceTree = "<group>"; };
+		34A24EB81E0A60D7007C9971 /* QKDateTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QKDateTool.h; sourceTree = "<group>"; };
+		34A24EB91E0A60D7007C9971 /* QKDateTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QKDateTool.m; sourceTree = "<group>"; };
 		B8B9315E5617C594364B75F8 /* libPods-AlarmClock.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AlarmClock.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD837C7BACFC3C90430013B9 /* Pods-AlarmClock.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AlarmClock.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AlarmClock/Pods-AlarmClock.debug.xcconfig"; sourceTree = "<group>"; };
 		E01EBECFC6B2159E3F16A403 /* Pods-AlarmClock.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AlarmClock.release.xcconfig"; path = "Pods/Target Support Files/Pods-AlarmClock/Pods-AlarmClock.release.xcconfig"; sourceTree = "<group>"; };
@@ -281,6 +290,8 @@
 				F0AA1E271E00E2520033D8E9 /* QKDialView.m */,
 				3416B54E1E077F7A00C70B98 /* QKMainTimeView.h */,
 				3416B54F1E077F7A00C70B98 /* QKMainTimeView.m */,
+				34A24EB51E0A5651007C9971 /* QKSecondsDialView.h */,
+				34A24EB61E0A5651007C9971 /* QKSecondsDialView.m */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -290,6 +301,10 @@
 			children = (
 				348DE0BD1E029D6D0027818F /* view */,
 				F0DACA4C1DFFD32100DC1D1E /* PrefixHeader.pch */,
+				34A24EB21E0A1ED3007C9971 /* QKConst.h */,
+				34A24EB31E0A1ED3007C9971 /* QKConst.m */,
+				34A24EB81E0A60D7007C9971 /* QKDateTool.h */,
+				34A24EB91E0A60D7007C9971 /* QKDateTool.m */,
 			);
 			path = common;
 			sourceTree = "<group>";
@@ -488,13 +503,16 @@
 			files = (
 				F0DACA091DFFC66600DC1D1E /* AppDelegate.m in Sources */,
 				3416B54D1E077DC100C70B98 /* QKMainTimeModel.m in Sources */,
+				34A24EB71E0A5651007C9971 /* QKSecondsDialView.m in Sources */,
 				F0DACA4A1DFFD19600DC1D1E /* QKMainCell.m in Sources */,
 				F0AA1E281E00E2520033D8E9 /* QKDialView.m in Sources */,
 				F0DACA061DFFC66600DC1D1E /* main.m in Sources */,
 				340A22711E03930300EBD3F5 /* QKTestViewController.m in Sources */,
 				F0DACA471DFFD16400DC1D1E /* QKMainController.m in Sources */,
 				F0DACA421DFFC7C500DC1D1E /* QKNavigationController.m in Sources */,
+				34A24EB41E0A1ED3007C9971 /* QKConst.m in Sources */,
 				3416B5501E077F7A00C70B98 /* QKMainTimeView.m in Sources */,
+				34A24EBA1E0A60D7007C9971 /* QKDateTool.m in Sources */,
 				348DE0C01E029D6D0027818F /* UIView+QKFrame.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

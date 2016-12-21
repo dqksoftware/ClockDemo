@@ -89,7 +89,7 @@ static NSString *cellIdentifer = @"maincellIdentifer";
     backGroudImageV.frame = CGRectMake(44.f, 0, SWIDTH, SHEIGHT);
      self.tableView.backgroundView = backGroudImageV;
     //刻度盘
-    CGFloat dialViewHeight = 200.f;
+    CGFloat dialViewHeight = 220.f;
     QKDialView *dialView = [[QKDialView alloc] initWithFrame:CGRectMake(0, SHEIGHT - dialViewHeight - 64, SWIDTH, dialViewHeight)];
     [self.tableView addSubview:dialView];
 //    [dialView mas_makeConstraints:^(MASConstraintMaker *make) {

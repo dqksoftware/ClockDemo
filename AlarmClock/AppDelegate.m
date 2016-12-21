@@ -21,8 +21,8 @@
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     QKNavigationController *navigation = [[QKNavigationController alloc] initWithRootViewController:[QKMainController new]];
     
-    //QKTestViewController *testVC = [[QKTestViewController alloc] init];
-//    self.window.rootViewController = testVC;
+    QKTestViewController *testVC = [[QKTestViewController alloc] init];
+    self.window.rootViewController = testVC;
     self.window.rootViewController = navigation;
     [self.window makeKeyAndVisible];
     

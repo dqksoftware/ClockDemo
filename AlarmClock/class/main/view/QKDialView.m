@@ -9,16 +9,8 @@
 #import "QKDialView.h"
 #import "QKMainTimeModel.h"
 #import "QKMainTimeView.h"
-
-typedef NS_ENUM(NSInteger, Time) {
-    TimeHour = 0,
-    TimePoints = 1,
-    TimeSeconds = 2,
-    TimeYear = 3,
-    TimeMonth = 4,
-    TimeDay = 5,
-    TimeWeek,
-};
+#import "QKDateTool.h"
+#import "QKSecondsDialView.h"
 
 @interface QKDialView ()
 
@@ -50,7 +42,11 @@ typedef NS_ENUM(NSInteger, Time) {
 
 @property(nonatomic, strong)QKMainTimeView *mainTimeView;   //时间视图
 
+@property(nonatomic, strong)QKSecondsDialView *secondDialView;
+
 @property(nonatomic, strong)QKMainTimeModel *mainTimeModel;   //时间模型
+
+
 
 
 
@@ -93,21 +89,26 @@ typedef NS_ENUM(NSInteger, Time) {
         make.bottom.equalTo(self.mas_bottom);
         make.height.equalTo(self.mas_height);
     }];
-   
     //创建键盘
     [self createDialViewForMintues];
     [self createDailViewForHour];
-
+    //
+    CGFloat r = 360.f;  //圆的半径
+    CGFloat x = SWIDTH / 2;  //圆心x坐标
     self.secondsView = [[UIView alloc] init];
-    self.secondsV
+    self.secondsView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
     [self addSubview:self.secondsView];
-    [self.secondsView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.minutesView.mas_top).offset(-20);
-        make.left.equalTo(self.mas_left);
-        make.right.equalTo(self.mas_right);
-        make.bottom.equalTo(self.mas_bottom);
-    }];
+    self.secondsView.layer.masksToBounds = YES;
+    self.secondsView.layer.cornerRadius = r;
+    self.secondsView.qk_height = 2 * r;
+    self.secondsView.qk_width = 2 * r;
+    self.secondsView.qk_centerX = x;
+    self.secondsView.qk_centerY = circle_y;
+    self.secondsView.layer.borderWidth = 3.f;
+    self.secondsView.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.8].CGColor;
     
+    self.secondDialView = [[QKSecondsDialView alloc] initWithFrame:CGRectMake(0, 0, self.qk_width, self.qk_height)];
+    [self addSubview:self.secondDialView];
     //时间视图
     self.mainTimeView = [QKMainTimeView new];
     [self addSubview:self.mainTimeView];
@@ -120,35 +121,25 @@ typedef NS_ENUM(NSInteger, Time) {
 }
 
 #pragma mark ------  创建转盘
+//创建时钟键盘
 - (void)createDailViewForHour{
-    CGFloat r = 370.f;  //圆的半径
     CGFloat x = SWIDTH / 2;  //圆心x坐标
-    CGFloat y = r + 50; //圆心y坐标
-    CGFloat startAngel = 115;  //开始弧度
-    CGFloat endAngel = 60;      //结束弧度
-    self.hourView = [self createDialView:startAngel endAgle:endAngel radius:r centerCircle:CGPointMake(x, y) timeType:TimeHour];
+    self.hourView = [self createDialView:hour_circle_startAngle endAgle:hour_circle_endAngle radius:hour_circle_radius centerCircle:CGPointMake(x, circle_y) timeType:TimeHour];
     //初始化临时标签数组
-
     self.tempLabelHourArrayM = self.lblHourArrayM;
-    [self setValueForTimeDatil:r centerCircle:CGPointMake(x, y) timeType:TimeHour];
+    [self setValueForTimeDatil:hour_circle_radius centerCircle:CGPointMake(x, circle_y) timeType:TimeHour];
 }
 
 //创建分钟键盘
 - (void)createDialViewForMintues{
-    CGFloat r = 370.f;  //圆的半径
     CGFloat x = SWIDTH / 2;  //圆心x坐标
-    CGFloat y = r; //圆心y坐标
-    CGFloat startAngel = 130;    //开始弧度
-    CGFloat endAngel = 50;      //结束弧度
-    self.minutesView = [self createDialView:startAngel endAgle:endAngel radius:r centerCircle:CGPointMake(x, y) timeType:TimePoints];
+    self.minutesView = [self createDialView:mintues_circle_startAngle endAgle:mintues_circle_endAngle radius:mintues_circle_radius centerCircle:CGPointMake(x, circle_y) timeType:TimePoints];
     //初始化临时标签数组
     self.tempLabelMintuesArrayM = self.lblMintuesArrayM;
-    [self setValueForTimeDatil:r centerCircle:CGPointMake(x, y) timeType:TimePoints];
+    [self setValueForTimeDatil:mintues_circle_radius centerCircle:CGPointMake(x, circle_y) timeType:TimePoints];
 }
 
 - (UIView *)createDialView:(CGFloat)startAngle endAgle:(CGFloat)endAngle radius:(CGFloat)radius centerCircle:(CGPoint)centerCircle timeType:(Time)timeType{
-    CGFloat lblWidth = 30.f;
-    CGFloat lblHeight = 25.f;
     //转盘视图
     UIView *deialPointView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 2 * radius, 2 * radius)];
     deialPointView.qk_centerX = centerCircle.x;
@@ -156,9 +147,8 @@ typedef NS_ENUM(NSInteger, Time) {
     [self addSubview:deialPointView];
     NSInteger lblconut = (startAngle - endAngle) / 5;
     for (int i = 0; i < lblconut; i++) {
-        CGPoint point = [self calcCircleCoordinateWithCenter:centerCircle andWithAngle:startAngle andWithRadius:radius];
-        startAngle -= 5;
-        CGRect lblFrame = CGRectMake(point.x, point.y, lblWidth, lblHeight);
+        CGPoint point = [QKDateTool calcCircleCoordinateWithCenter:centerCircle andWithAngle:startAngle andWithRadius:radius];
+        CGRect lblFrame = CGRectMake(point.x, point.y, label_width, label_height);
         UILabel *lable = [[UILabel alloc] init];
         lable.qk_height = lblFrame.size.height;
         lable.qk_width = lblFrame.size.width;
@@ -166,17 +156,25 @@ typedef NS_ENUM(NSInteger, Time) {
         lable.qk_centerX = lblFrame.origin.x;
         lable.textAlignment = NSTextAlignmentCenter;
         lable.textColor = [UIColor whiteColor];
-        lable.font = [UIFont boldSystemFontOfSize:20];
+        lable.font = [UIFont boldSystemFontOfSize:15];
         lable.tag = i + 200;
+        //切记 此View是以90度为0度的
+        CGFloat offsetAngle = 90 - startAngle;
+        if (startAngle >= 90) {
+            lable.transform = CGAffineTransformMakeRotation(offsetAngle / 90);
+        }else{
+            lable.transform = CGAffineTransformMakeRotation(offsetAngle / 90);
+        }
         if (timeType == TimePoints) {
             [self.lblMintuesFrameArrayM addObject:NSStringFromCGRect(lblFrame)];
             [self.lblMintuesArrayM addObject:lable];
+            startAngle -= 5;
         }
         if (timeType == TimeHour) {
             [self.lblHourFrameArrayM addObject:NSStringFromCGRect(lblFrame)];
             [self.lblHourArrayM addObject:lable];
+            startAngle -= 5;
         }
-        
         [deialPointView addSubview:lable];
     }
     return deialPointView;
@@ -199,17 +197,17 @@ typedef NS_ENUM(NSInteger, Time) {
 
 - (QKMainTimeModel *)getTimeModel{
     //获取当前时
-    NSString *hour = [self getPointsForNowTime:TimeHour];
+    NSString *hour = [QKDateTool getPointsForNowTime:TimeHour];
     //获取当前分
-    NSString *minute = [self getPointsForNowTime:TimePoints];
+    NSString *minute = [QKDateTool getPointsForNowTime:TimePoints];
     //获取当前年
-    NSString *year = [self getPointsForNowTime:TimeYear];
+    NSString *year = [QKDateTool getPointsForNowTime:TimeYear];
     //获取当年月
-    NSString *month = [self getPointsForNowTime:TimeMonth];
+    NSString *month = [QKDateTool getPointsForNowTime:TimeMonth];
     //获取当前日
-    NSString *day = [self getPointsForNowTime:TimeDay];
+    NSString *day = [QKDateTool getPointsForNowTime:TimeDay];
     //获取周天
-    NSString *week = [self getPointsForNowTime:TimeWeek];
+    NSString *week = [QKDateTool getPointsForNowTime:TimeWeek];
     
     if (![self.mainTimeModel.minutes isEqualToString:minute]) {
         self.mainTimeModel.minutes = minute;
@@ -224,82 +222,22 @@ typedef NS_ENUM(NSInteger, Time) {
     return self.mainTimeModel;
 }
 
-//获取当前的时分秒
-- (NSString *)getPointsForNowTime:(Time)timeType{
-    NSDate *nowDate = [NSDate date];
-    NSDateFormatter *formate = [[NSDateFormatter alloc] init];
-    formate.dateFormat = @"yyyy-MM-dd hh:mm:ss";
-    NSString *dateStr = [formate stringFromDate:nowDate];
-    NSString *yearTime = [dateStr componentsSeparatedByString:@" "].firstObject;
-    NSString *hourTime = [dateStr componentsSeparatedByString:@" "].lastObject;
-    if (timeType == TimeHour) {
-        return [hourTime componentsSeparatedByString:@":"].firstObject;
-    }
-    if (timeType == TimeSeconds) {
-        return [hourTime componentsSeparatedByString:@":"].lastObject;
-    }
-    if (timeType == TimePoints) {
-        return [hourTime componentsSeparatedByString:@":"][1];
-    }
-    if (timeType == TimeYear) {
-        return [yearTime componentsSeparatedByString:@"-"].firstObject;
-    }
-    if (timeType == TimeMonth) {
-        return [yearTime componentsSeparatedByString:@"-"][1];
-    }
-    if (timeType == TimeDay) {
-        return [yearTime componentsSeparatedByString:@"-"].lastObject;
-    }
-    if (timeType == TimeWeek) {
-        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierIndian];
-        NSDateComponents *comps = [[NSDateComponents alloc] init];
-        NSInteger unitFlags = NSCalendarUnitWeekday;
-        comps = [calendar components:unitFlags fromDate:nowDate];
-        return [NSString stringWithFormat:@"%ld", [comps weekday]];
-    }
-    
-    return nil;
-}
-
-#pragma mark  ----  计算坐标点
-//计算圆周上的坐标点    此方法适合计算在x轴上半周  即0 - 90 - 180 的度数
--(CGPoint) calcCircleCoordinateWithCenter:(CGPoint)center andWithAngle:(CGFloat)angle andWithRadius:(CGFloat) radius{
-    CGFloat x2 = radius*cosf(angle*M_PI/180);
-    
-    CGFloat y2 = radius*sinf(angle*M_PI/180);
-    if (angle >= 90 && angle < 180) {     //第象限
-        x2 = radius - fabs(x2);
-        y2 = radius - fabs(y2);
-    }else if(angle < 90 && angle >= 0){    //第二象限
-        x2 = radius + fabs(x2);
-        y2 = radius - fabs(y2);
-    }else if(angle > 180 && angle <= 270){   //第三象限
-        x2 = radius - fabs(x2);
-        y2 = radius + fabs(y2);
-    }else{                                    //第四象限
-        x2 = radius + fabs(x2);
-        y2 = radius + fabs(y2);
-    }
-    return CGPointMake(fabs(x2), fabs(y2));
-}
 
 #pragma mark  添加刻度值
 - (void)setValueForTimeDatil:(CGFloat)radius centerCircle:(CGPoint)centerCircle timeType:(Time)TimeType{
-    CGFloat lblWidth = 30.f;
-    CGFloat lblHeight = 25.f;
     NSInteger angle90Index;
     NSMutableArray *tempArrayM;
     //当前 的分钟数值
     NSString *currentTimeValue;
-    CGPoint point = [self calcCircleCoordinateWithCenter:centerCircle andWithAngle:90 andWithRadius:radius];
-    CGRect lblFrame = CGRectMake(point.x, point.y, lblWidth, lblHeight);
+    CGPoint point = [QKDateTool calcCircleCoordinateWithCenter:centerCircle andWithAngle:90 andWithRadius:radius];
+    CGRect lblFrame = CGRectMake(point.x, point.y, label_width, label_height);
     if (TimeType == TimePoints) {
         tempArrayM = self.lblMintuesArrayM;
-        currentTimeValue = [self getPointsForNowTime:TimePoints];
+        currentTimeValue = [QKDateTool getPointsForNowTime:TimePoints];
         angle90Index = [self.lblMintuesFrameArrayM indexOfObject:NSStringFromCGRect(lblFrame)];
     }else{
         tempArrayM = self.lblHourArrayM;
-        currentTimeValue = [self getPointsForNowTime:TimeHour];
+        currentTimeValue = [QKDateTool getPointsForNowTime:TimeHour];
         angle90Index = [self.lblHourFrameArrayM indexOfObject:NSStringFromCGRect(lblFrame)];
     }
     NSInteger currentTimeValueInt = currentTimeValue.integerValue;
@@ -325,69 +263,78 @@ typedef NS_ENUM(NSInteger, Time) {
             currentLabel.text = currentTimeValue;;
         }
     }
-
 }
 
 #pragma mark  ------- 位移互换
-- (void)pointChange{
-    for (int i = 0; i < self.lblMintuesFrameArrayM.count; i++) {
-    UILabel *label = self.lblMintuesArrayM[i];
-        if (i==0) {
-            continue;
-        }
+- (void)pointChange:(Time)timeType{
+    NSMutableArray *lblFrameArrayM;
+    NSMutableArray *lblArrarM;
+    NSMutableArray *tempLblArrayM;
+    CGAffineTransform tempCGAffineTransform;
+    if (timeType == TimePoints) {
+        lblFrameArrayM = self.lblMintuesFrameArrayM;
+        lblArrarM = self.lblMintuesArrayM;
+        tempLblArrayM = self.tempLabelMintuesArrayM;
+    }
+    if (timeType == TimeHour) {
+        lblFrameArrayM = self.lblHourFrameArrayM;
+        lblArrarM = self.lblHourArrayM;
+        tempLblArrayM = self.tempLabelHourArrayM;
+    }
+    for (int i = 0; i < lblFrameArrayM.count; i++) {
+    UILabel *label = lblArrarM[i];
+    tempCGAffineTransform = label.transform;
+    if (i==0) {
+        continue;
+    }
        [UIView animateWithDuration:1.f animations:^{
-            //标签的frame 都往前位移一位
-            label.frame = CGRectFromString(self.lblMintuesFrameArrayM[i-1]);
-            label.qk_centerX = CGRectFromString(self.lblMintuesFrameArrayM[i-1]).origin.x;
-            label.qk_centerY = CGRectFromString(self.lblMintuesFrameArrayM[i-1]).origin.y;
-            [self.tempLabelMintuesArrayM replaceObjectAtIndex:i-1 withObject:label];
+          //标签的frame 都往前位移一位
+           label.frame = CGRectFromString(lblFrameArrayM[i-1]);
+           label.qk_centerX = CGRectFromString(lblFrameArrayM[i-1]).origin.x;
+           label.qk_centerY = CGRectFromString(lblFrameArrayM[i-1]).origin.y;
+           label.transform = tempCGAffineTransform;
+            [tempLblArrayM replaceObjectAtIndex:i-1 withObject:label];
         }];
     }
     //特殊判断第一个标签位移到后面
-    UILabel *firstLabel = self.lblMintuesArrayM.firstObject;
-    firstLabel.frame = CGRectFromString(self.lblMintuesFrameArrayM.lastObject);
-    firstLabel.qk_centerX = CGRectFromString(self.lblMintuesFrameArrayM.lastObject).origin.x;
-    firstLabel.qk_centerY = CGRectFromString(self.lblMintuesFrameArrayM.lastObject).origin.y;
-    UILabel *lastLabel = self.lblMintuesArrayM.lastObject;
-    firstLabel.text = [self minutesConversion:lastLabel.text];
-    [self.tempLabelMintuesArrayM replaceObjectAtIndex:self.lblMintuesArrayM.count - 1 withObject:firstLabel];
+    UILabel *firstLabel = lblArrarM.firstObject;
+    firstLabel.frame = CGRectFromString(lblFrameArrayM.lastObject);
+    firstLabel.qk_centerX = CGRectFromString(lblFrameArrayM.lastObject).origin.x;
+    firstLabel.qk_centerY = CGRectFromString(lblFrameArrayM.lastObject).origin.y;
+    UILabel *lastLabel = lblArrarM.lastObject;
+    firstLabel.text = [QKDateTool minutesConversion:lastLabel.text];
+    firstLabel.transform = lastLabel.transform;
+    [tempLblArrayM replaceObjectAtIndex:lblArrarM.count - 1 withObject:firstLabel];
     //重新赋值标签数组
-    self.lblMintuesArrayM = self.tempLabelMintuesArrayM;
-}
-//分钟转换
-- (NSString *)minutesConversion:(NSString *)minutesStr{
-    NSString *tempMinutes;
-    NSInteger minutesInt =  minutesStr.integerValue + 1;
-    if (minutesInt >= 60) {
-        minutesInt -= 60;
-        if (minutesInt < 10) {
-            tempMinutes = [NSString stringWithFormat:@"%.2ld", minutesInt];
-        }else{
-            tempMinutes = [NSString stringWithFormat:@"%ld", minutesInt];
-        }
-        
-    }else{
-        tempMinutes = [NSString stringWithFormat:@"%ld", minutesInt];
+    if (timeType == TimePoints) {
+        self.lblMintuesArrayM = tempLblArrayM;
     }
-    return tempMinutes;
+    if (timeType == TimeHour) {
+        self.lblHourArrayM = tempLblArrayM;
+    }
+    
 }
-
 #pragma mark  ----- 观察者方法
-
 - (void)addObserver{
     [self addObserver:self forKeyPath:@"mainTimeModel.minutes" options:NSKeyValueObservingOptionNew context:nil];
+    
+    [self addObserver:self forKeyPath:@"mainTimeModel.hour" options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
-    
-    [self pointChange];
+    if ([keyPath isEqualToString:@"mainTimeModel.minutes"]) {
+        [self pointChange:TimePoints];
+    }
+    if ([keyPath isEqualToString:@"mainTimeModel.hour"]) {
+        [self pointChange:TimePoints];
+    }
 }
-
 
 - (void)dealloc{
     [self.timer invalidate];
     self.timer = nil;
     [self removeObserver:self forKeyPath:@"mainTimeModel.minutes"];
+    [self removeObserver:self forKeyPath:@"mainTimeModel.hour"];
 }
 
 
