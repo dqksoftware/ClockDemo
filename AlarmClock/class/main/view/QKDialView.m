@@ -15,7 +15,7 @@
 @interface QKDialView ()
 
 /************ 数据属性 *****************/
-@property(nonatomic, strong)UIImageView *backGroundImage;   //背景图片
+//@property(nonatomic, strong)UIImageView *backGroundImage;   //背景图片
 
 @property(nonatomic, strong)NSMutableArray *lblMintuesFrameArrayM;   //标签刻度frame数组
 
@@ -28,6 +28,8 @@
 @property(nonatomic, strong)NSMutableArray *tempLabelMintuesArrayM;  //标签数组  用来重置数组
 
 @property(nonatomic, strong)NSMutableArray *tempLabelHourArrayM;     //标签数组  用来重置数组
+
+@property(nonatomic, strong)NSMutableArray *transMintuesFormArrayM;  //形变属性数组
 
 
 /*****************************/
@@ -42,13 +44,11 @@
 
 @property(nonatomic, strong)QKMainTimeView *mainTimeView;   //时间视图
 
-@property(nonatomic, strong)QKSecondsDialView *secondDialView;
+@property(nonatomic, strong)QKSecondsDialView *secondDialView; //秒盘
 
 @property(nonatomic, strong)QKMainTimeModel *mainTimeModel;   //时间模型
 
-
-
-
+@property(nonatomic, strong)CAGradientLayer *gradientLayer;  //梯度层
 
 
 @end
@@ -73,27 +73,30 @@
 
 //加载子视图
 - (void)setUpView{
+
     //标签frame数组
     self.lblMintuesFrameArrayM = [NSMutableArray array];
     self.lblHourFrameArrayM = [NSMutableArray array];
+    self.transMintuesFormArrayM = [NSMutableArray array];
     //标签数组
     NSMutableArray *lblArrayM = [NSMutableArray array];
     self.lblMintuesArrayM = lblArrayM;
     self.lblHourArrayM = [NSMutableArray array];
+    self.gradientLayer = [CAGradientLayer layer];
+    self.gradientLayer.frame = self.bounds;
+    [self.layer addSublayer:self.gradientLayer];
+    //设置颜色渐变方向
+    self.gradientLayer.startPoint = CGPointMake(0.5, 0);
+    self.gradientLayer.endPoint = CGPointMake(0.5, 1);
+    //设定颜色分割点
+    self.gradientLayer.locations = @[@(0.5f) ,@(0.2f)];
+    self.gradientLayer.colors = @[(__bridge id)[UIColor clearColor].CGColor, (__bridge id)[UIColor colorWithRed:0 green:0 blue:0 alpha:0.5].CGColor, (__bridge id)[UIColor blackColor].CGColor];
     
-    self.backGroundImage = [[UIImageView alloc] init];
-    [self addSubview:self.backGroundImage];
-    [self.backGroundImage mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(@0);
-        make.right.equalTo(self.mas_right);
-        make.bottom.equalTo(self.mas_bottom);
-        make.height.equalTo(self.mas_height);
-    }];
     //创建键盘
     [self createDialViewForMintues];
     [self createDailViewForHour];
     //
-    CGFloat r = 360.f;  //圆的半径
+    CGFloat r = seconds_circle_radius;  //圆的半径
     CGFloat x = SWIDTH / 2;  //圆心x坐标
     self.secondsView = [[UIView alloc] init];
     self.secondsView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
@@ -113,11 +116,13 @@
     self.mainTimeView = [QKMainTimeView new];
     [self addSubview:self.mainTimeView];
     [self.mainTimeView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(@50);
+        make.top.equalTo(@70);
         make.centerX.equalTo(self.mas_centerX);
         make.bottom.equalTo(self.mas_bottom).offset(-15);
-        make.width.equalTo(@(SWIDTH / 2 + 20));
+        make.width.equalTo(@(SWIDTH / 2 + 40));
     }];
+    
+ 
 }
 
 #pragma mark ------  创建转盘
@@ -162,12 +167,15 @@
         CGFloat offsetAngle = 90 - startAngle;
         if (startAngle >= 90) {
             lable.transform = CGAffineTransformMakeRotation(offsetAngle / 90);
+
         }else{
             lable.transform = CGAffineTransformMakeRotation(offsetAngle / 90);
         }
         if (timeType == TimePoints) {
             [self.lblMintuesFrameArrayM addObject:NSStringFromCGRect(lblFrame)];
             [self.lblMintuesArrayM addObject:lable];
+            NSValue *value = [NSValue valueWithCGAffineTransform:lable.transform];
+            [self.transMintuesFormArrayM addObject:value];
             startAngle -= 5;
         }
         if (timeType == TimeHour) {
@@ -245,23 +253,43 @@
     for (int i = 0; i < tempArrayM.count; i++) {
         UILabel *currentLabel = tempArrayM[i];
         NSInteger tag = currentLabel.tag - 200;
-        if (tag != angle90Index) {
-            
-            if (currentTimeValueInt - (angle90Index - tag) >= 60) {
-                otherLabelValue = currentTimeValueInt - (angle90Index - tag) - 60;
-            }else if((currentTimeValueInt - (angle90Index - tag)) < 0){
-                otherLabelValue = currentTimeValueInt - (angle90Index - tag) + 60;
+        if (TimeType == TimePoints) {
+            if (tag != angle90Index) {
+                if (currentTimeValueInt - (angle90Index - tag) >= 60) {
+                    otherLabelValue = currentTimeValueInt - (angle90Index - tag) - 60;
+                }else if((currentTimeValueInt - (angle90Index - tag)) < 0){
+                    otherLabelValue = currentTimeValueInt - (angle90Index - tag) + 60;
+                }else{
+                    otherLabelValue = currentTimeValueInt - (angle90Index - tag);
+                }
+                if (otherLabelValue < 10) {
+                    currentLabel.text = [NSString stringWithFormat:@"0%@", @(otherLabelValue)];
+                }else{
+                    currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelValue)];
+                }
             }else{
-                otherLabelValue = currentTimeValueInt - (angle90Index - tag);
-            }
-            if (otherLabelValue < 10) {
-                currentLabel.text = [NSString stringWithFormat:@"0%@", @(otherLabelValue)];
-            }else{
-                currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelValue)];
+                currentLabel.text = currentTimeValue;;
             }
         }else{
-            currentLabel.text = currentTimeValue;;
+            if (tag != angle90Index) {
+                if (currentTimeValueInt - (angle90Index - tag) >= 24) {
+                    otherLabelValue = currentTimeValueInt - (angle90Index - tag) - 24;
+                }else if((currentTimeValueInt - (angle90Index - tag)) < 0){
+                    otherLabelValue = currentTimeValueInt - (angle90Index - tag) + 24;
+                }else{
+                    otherLabelValue = currentTimeValueInt - (angle90Index - tag);
+                }
+                if (otherLabelValue < 10) {
+                    currentLabel.text = [NSString stringWithFormat:@"0%@", @(otherLabelValue)];
+                }else{
+                    currentLabel.text = [NSString stringWithFormat:@"%@", @(otherLabelValue)];
+                }
+            }else{
+                currentLabel.text = currentTimeValue;;
+            }
+
         }
+       
     }
 }
 
@@ -270,7 +298,6 @@
     NSMutableArray *lblFrameArrayM;
     NSMutableArray *lblArrarM;
     NSMutableArray *tempLblArrayM;
-    CGAffineTransform tempCGAffineTransform;
     if (timeType == TimePoints) {
         lblFrameArrayM = self.lblMintuesFrameArrayM;
         lblArrarM = self.lblMintuesArrayM;
@@ -282,20 +309,23 @@
         tempLblArrayM = self.tempLabelHourArrayM;
     }
     for (int i = 0; i < lblFrameArrayM.count; i++) {
-    UILabel *label = lblArrarM[i];
-    tempCGAffineTransform = label.transform;
-    if (i==0) {
-        continue;
-    }
-       [UIView animateWithDuration:1.f animations:^{
-          //标签的frame 都往前位移一位
-           label.frame = CGRectFromString(lblFrameArrayM[i-1]);
-           label.qk_centerX = CGRectFromString(lblFrameArrayM[i-1]).origin.x;
-           label.qk_centerY = CGRectFromString(lblFrameArrayM[i-1]).origin.y;
-           label.transform = tempCGAffineTransform;
-            [tempLblArrayM replaceObjectAtIndex:i-1 withObject:label];
-        }];
-    }
+        UILabel *label = lblArrarM[i];
+        
+        if (i==0) {
+            continue;
+        }else{
+            [UIView animateWithDuration:1.f animations:^{
+                //标签的frame 都往前位移一位
+                label.frame = CGRectFromString(lblFrameArrayM[i-1]);
+                label.qk_centerX = CGRectFromString(lblFrameArrayM[i-1]).origin.x;
+                label.qk_centerY = CGRectFromString(lblFrameArrayM[i-1]).origin.y;
+                NSValue *valueTransForm = self.transMintuesFormArrayM[i-1];
+                CGAffineTransform transForm = [valueTransForm CGAffineTransformValue];
+                label.transform = transForm;
+                [tempLblArrayM replaceObjectAtIndex:i-1 withObject:label];
+            }];
+        }
+   }
     //特殊判断第一个标签位移到后面
     UILabel *firstLabel = lblArrarM.firstObject;
     firstLabel.frame = CGRectFromString(lblFrameArrayM.lastObject);
@@ -303,8 +333,11 @@
     firstLabel.qk_centerY = CGRectFromString(lblFrameArrayM.lastObject).origin.y;
     UILabel *lastLabel = lblArrarM.lastObject;
     firstLabel.text = [QKDateTool minutesConversion:lastLabel.text];
-    firstLabel.transform = lastLabel.transform;
+    NSValue *valueTransForm = self.transMintuesFormArrayM.lastObject;
+    CGAffineTransform transForm = [valueTransForm CGAffineTransformValue];
+    firstLabel.transform = transForm;
     [tempLblArrayM replaceObjectAtIndex:lblArrarM.count - 1 withObject:firstLabel];
+
     //重新赋值标签数组
     if (timeType == TimePoints) {
         self.lblMintuesArrayM = tempLblArrayM;
@@ -326,6 +359,7 @@
         [self pointChange:TimePoints];
     }
     if ([keyPath isEqualToString:@"mainTimeModel.hour"]) {
+        
         [self pointChange:TimePoints];
     }
 }

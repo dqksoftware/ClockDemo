@@ -7,7 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "QKEditAlermView.h"
+
+@protocol QKMainCellDelegate <NSObject>
+
+- (void)qk_MainCellHandLongGesture:(UILongPressGestureRecognizer *)gesture;
+
+@end
 
 @interface QKMainCell : UITableViewCell
+
+@property(nonatomic, strong)QKEditAlermView *editAlertView;
+
+@property(nonatomic, assign)id delegate;
 
 @end

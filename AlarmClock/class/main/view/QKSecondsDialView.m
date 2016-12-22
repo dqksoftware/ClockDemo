@@ -60,7 +60,7 @@
         CGPoint point = [QKDateTool calcCircleCoordinateWithCenter:centerCircle andWithAngle:startAngle andWithRadius:radius];
         UILabel *lable = [[UILabel alloc] init];
         lable.qk_height = 10;
-        lable.qk_width = 3;
+        lable.qk_width = 1.5;
         lable.qk_y = point.y - lable.qk_height;
         lable.qk_x = point.x;
         lable.backgroundColor = [UIColor whiteColor];

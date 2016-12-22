@@ -25,6 +25,8 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         self.backgroundColor = [UIColor clearColor];
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        [self addGesture];
      [self setUpView];
     }
     return self;
@@ -40,7 +42,8 @@
     CGFloat centerYOffset = 7.f;
     CGFloat topMarginIg = 10.f;
     self.backImageV = [[UIImageView alloc] init];
-    self.backImageV.backgroundColor = [UIColor grayColor];
+    self.backImageV.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
+//    self.backImageV.backgroundColor = [UIColor redColor];
     [self addSubview:self.backImageV];
     [self.backImageV mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.contentView.mas_left).offset(leftMarginImg);
@@ -70,7 +73,33 @@
         make.top.equalTo(self.backImageV.mas_centerY).offset(10);
     }];
     
+    self.editAlertView = [[QKEditAlermView alloc] initWithFrame:CGRectMake(0, 0, 0, self.backImageV.qk_height)];
+    [self.backImageV addSubview:self.editAlertView];
+//    [self.editAlertView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.left.equalTo(self.backImageV.mas_right);
+//        make.height.equalTo(self.backImageV.mas_height);
+//        make.width.equalTo(@(0));
+//        make.top.equalTo(self.backImageV.mas_top);
+//    }];
 }
+
+- (void)addGesture{
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handGesture:)];
+    [self addGestureRecognizer:longPressGesture];
+}
+
+- (void)handGesture:(UILongPressGestureRecognizer *)gesture{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(qk_MainCellHandLongGesture:)]) {
+        [self.delegate qk_MainCellHandLongGesture:gesture];
+        [UIView animateWithDuration:0.5 animations:^{
+            self.editAlertView.qk_x = 0;
+            self.editAlertView.qk_height = self.backImageV.qk_height;
+            self.editAlertView.qk_width = self.backImageV.qk_width;
+
+        }];
+    }
+}
+
 
 
 @end

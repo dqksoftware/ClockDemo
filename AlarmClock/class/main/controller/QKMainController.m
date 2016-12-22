@@ -10,7 +10,7 @@
 #import "QKMainCell.h"
 #import "QKDialView.h"
 
-@interface QKMainController ()
+@interface QKMainController ()<QKMainCellDelegate>
 
 @property(nonatomic, strong)NSMutableArray *datasource;
 
@@ -54,7 +54,7 @@ static NSString *cellIdentifer = @"maincellIdentifer";
     if (!cell) {
         cell = [[QKMainCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifer];
     }
-    
+    cell.delegate = self;
     return cell;
 }
 
@@ -92,18 +92,7 @@ static NSString *cellIdentifer = @"maincellIdentifer";
     CGFloat dialViewHeight = 220.f;
     QKDialView *dialView = [[QKDialView alloc] initWithFrame:CGRectMake(0, SHEIGHT - dialViewHeight - 64, SWIDTH, dialViewHeight)];
     [self.tableView addSubview:dialView];
-//    [dialView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.height.equalTo(@(125.f));
-//        make.bottom.equalTo(self.tableView.mas_bottom);
-//        make.left.equalTo(@0);
-//        make.right.equalTo(self.tableView.mas_right);
-//    }];
-    
 }
-
-
-
-
 #pragma mark ----   单击事件
 ///新建闹钟
 - (void)addAction{
@@ -113,6 +102,15 @@ static NSString *cellIdentifer = @"maincellIdentifer";
 //编辑闹钟
 - (void)editAction{
     
+}
+
+- (void)qk_MainCellHandLongGesture:(UILongPressGestureRecognizer *)gesture{
+    CGPoint point = [gesture locationInView:self.tableView];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:point];
+    
+    
+    
+    NSLog(@"--------    %ld", indexPath.item);
 }
 
 

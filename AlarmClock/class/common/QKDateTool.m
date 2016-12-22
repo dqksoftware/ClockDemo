@@ -13,7 +13,7 @@
 + (NSString *)getPointsForNowTime:(Time)timeType{
     NSDate *nowDate = [NSDate date];
     NSDateFormatter *formate = [[NSDateFormatter alloc] init];
-    formate.dateFormat = @"yyyy-MM-dd hh:mm:ss";
+    formate.dateFormat = @"yyyy-MM-dd HH:mm:ss";
     NSString *dateStr = [formate stringFromDate:nowDate];
     NSString *yearTime = [dateStr componentsSeparatedByString:@" "].firstObject;
     NSString *hourTime = [dateStr componentsSeparatedByString:@" "].lastObject;
@@ -74,16 +74,22 @@
 +(NSString *)minutesConversion:(NSString *)minutesStr{
     NSString *tempMinutes;
     NSInteger minutesInt =  minutesStr.integerValue + 1;
+    
     if (minutesInt >= 60) {
         minutesInt -= 60;
         if (minutesInt < 10) {
             tempMinutes = [NSString stringWithFormat:@"0%ld", minutesInt];
+
         }else{
             tempMinutes = [NSString stringWithFormat:@"%ld", minutesInt];
         }
         
     }else{
-        tempMinutes = [NSString stringWithFormat:@"%ld", minutesInt];
+        if (minutesInt < 10) {
+            tempMinutes = [NSString stringWithFormat:@"0%ld", minutesInt];
+        }else{
+            tempMinutes = [NSString stringWithFormat:@"%ld", minutesInt];
+        }
     }
     return tempMinutes;
 }

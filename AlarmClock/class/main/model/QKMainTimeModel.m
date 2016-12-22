@@ -24,25 +24,25 @@
     NSString *weekString;
     switch (weeks.integerValue) {
         case 0:
-            weekString = @"日";
-            break;
-        case (1):
             weekString = @"一";
             break;
-        case (2):
+        case (1):
             weekString = @"二";
             break;
-        case (3):
+        case (2):
             weekString = @"三";
             break;
-        case (4):
+        case (3):
             weekString = @"四";
             break;
-        case (5):
+        case (4):
             weekString = @"五";
             break;
-        case (6):
+        case (5):
             weekString = @"六";
+            break;
+        case (6):
+            weekString = @"日";
             break;
         default:
             break;
